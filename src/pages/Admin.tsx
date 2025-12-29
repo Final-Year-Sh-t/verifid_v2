@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { BulkUpload } from '@/components/BulkUpload';
 import { 
   Plus, 
   Loader2, 
@@ -292,19 +293,25 @@ export default function Admin() {
             <h1 className="font-display text-3xl font-bold tracking-tight">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage identity records and view verification logs.</p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) {
-              setEditingRecord(null);
-              resetForm();
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button className="gradient-primary border-0 gap-2">
-                <Plus className="h-4 w-4" />
-                Add Record
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <BulkUpload 
+              institutionId={institutionId} 
+              userId={user?.id || ''} 
+              onComplete={fetchData} 
+            />
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) {
+                setEditingRecord(null);
+                resetForm();
+              }
+            }}>
+              <DialogTrigger asChild>
+                <Button className="gradient-primary border-0 gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Record
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle className="font-display">
@@ -407,6 +414,7 @@ export default function Admin() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Stats Cards */}
