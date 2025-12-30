@@ -39,10 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkRolesAndInstitution = async (userId: string) => {
     try {
-      // Check for admin and super_admin roles
+      // Fetch roles + active institution flag
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select('role, institution_id')
+        .select('role, institution_id, is_active')
         .eq('user_id', userId);
 
       if (rolesError) {
@@ -50,11 +50,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { isAdmin: false, isSuperAdmin: false, institutionId: null };
       }
 
-      const hasAdmin = roles?.some(r => r.role === 'admin') ?? false;
-      const hasSuperAdmin = roles?.some(r => r.role === 'super_admin') ?? false;
-      const instId = roles?.find(r => r.institution_id)?.institution_id ?? null;
+      const hasSuperAdmin = roles?.some((r) => r.role === 'super_admin') ?? false;
 
-      return { isAdmin: hasAdmin || hasSuperAdmin, isSuperAdmin: hasSuperAdmin, institutionId: instId };
+      // Prefer the explicitly active institution; fall back to any institution if none marked active.
+      const activeInstitutionId =
+        roles?.find((r) => r.is_active && r.institution_id)?.institution_id ??
+        roles?.find((r) => r.institution_id)?.institution_id ??
+        null;
+
+      // Admin should be scoped to the active institution (super_admin overrides)
+      const hasAdminForActiveInstitution = activeInstitutionId
+        ? roles?.some((r) => r.role === 'admin' && r.institution_id === activeInstitutionId) ?? false
+        : false;
+
+      return {
+        isAdmin: hasSuperAdmin || hasAdminForActiveInstitution,
+        isSuperAdmin: hasSuperAdmin,
+        institutionId: activeInstitutionId,
+      };
     } catch (error) {
       console.error('Error checking roles:', error);
       return { isAdmin: false, isSuperAdmin: false, institutionId: null };
