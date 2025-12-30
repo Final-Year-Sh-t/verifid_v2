@@ -38,7 +38,7 @@ interface DashboardStats {
 type OnboardingStep = 'choice' | 'create' | 'join';
 
 export default function Dashboard() {
-  const { user, institution, institutionId, isLoading: authLoading } = useAuth();
+  const { user, institution, institutionId, isLoading: authLoading, refreshAuth } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -149,7 +149,7 @@ export default function Dashboard() {
         description: 'You are now the admin of your institution.',
       });
 
-      window.location.reload();
+      await refreshAuth();
     } catch (error: any) {
       console.error('Create institution error:', error);
       toast({
@@ -224,7 +224,7 @@ export default function Dashboard() {
         description: 'You have joined the institution.',
       });
 
-      window.location.reload();
+      await refreshAuth();
     } catch (error: any) {
       console.error('Join error:', error);
       toast({
