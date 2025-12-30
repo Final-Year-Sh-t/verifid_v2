@@ -21,8 +21,17 @@ import {
   FileText,
   Building2,
   Plus,
-  RefreshCw
+  RefreshCw,
+  ChevronDown
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -623,7 +632,57 @@ export default function Dashboard() {
 
           {/* Institution Management */}
           <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
-            <h2 className="font-display text-lg font-semibold mb-4">Institution</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-lg font-semibold">Institution</h2>
+              {userInstitutions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2" disabled={isSwitching}>
+                      {isSwitching ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Building2 className="h-4 w-4" />
+                      )}
+                      <span className="hidden sm:inline">{institution?.name || 'Select'}</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <DropdownMenuLabel>Your Institutions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {userInstitutions.map((inst) => (
+                      <DropdownMenuItem
+                        key={inst.institution_id}
+                        onClick={() => !inst.is_active && handleSwitchInstitution(inst.institution_id)}
+                        className={inst.is_active ? 'bg-primary/10' : 'cursor-pointer'}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <Building2 className="h-4 w-4 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{inst.institution_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              <span className="capitalize">{inst.role}</span>
+                            </p>
+                          </div>
+                          {inst.is_active && (
+                            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleOpenSwitchModal('join')}>
+                      <Users className="h-4 w-4 mr-2" />
+                      Join Another
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleOpenSwitchModal('create')}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create New
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
             <div className="space-y-3">
               {/* Current Institution */}
               <Card className="border-primary/30 bg-primary/5">
@@ -643,7 +702,7 @@ export default function Dashboard() {
                         <p className="text-xs text-muted-foreground font-mono">{institution?.slug || ''}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 sm:hidden">
                       <Button
                         variant="outline"
                         size="sm"
@@ -651,7 +710,7 @@ export default function Dashboard() {
                         className="gap-1.5"
                       >
                         <Users className="h-3.5 w-3.5" />
-                        Join Another
+                        Join
                       </Button>
                       <Button
                         variant="outline"
@@ -660,7 +719,7 @@ export default function Dashboard() {
                         className="gap-1.5"
                       >
                         <Plus className="h-3.5 w-3.5" />
-                        Create New
+                        New
                       </Button>
                     </div>
                   </div>
