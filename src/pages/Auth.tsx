@@ -239,7 +239,7 @@ export default function Auth() {
                     {isSignUp ? 'Creating account...' : 'Signing in...'}
                   </>
                 ) : (
-                  isSignUp ? 'Register' : 'Login'
+                  isSignUp ? 'Get Started' : 'Sign In'
                 )}
               </button>
             </form>
@@ -247,7 +247,7 @@ export default function Auth() {
             <p className="mt-6 text-center text-muted-foreground text-sm">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button onClick={toggleMode} className="text-primary font-medium hover:underline">
-                {isSignUp ? 'Sign In' : 'Sign Up'}
+                {isSignUp ? 'Sign In' : 'Get Started'}
               </button>
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function Auth() {
               onClick={toggleMode}
               className="mt-4 px-8 py-2 border-2 border-primary-foreground/50 rounded-full text-primary-foreground hover:bg-primary-foreground/10 transition-colors animate-fade-in"
             >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
+              {isSignUp ? 'Sign In' : 'Get Started'}
             </button>
           </div>
         </div>
@@ -285,7 +285,7 @@ export default function Auth() {
           }`}
         >
           <div className="w-full max-w-sm">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Login</h2>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Sign In</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <FloatingInput
                 id="signin-email"
@@ -318,7 +318,7 @@ export default function Auth() {
                     Signing in...
                   </>
                 ) : (
-                  'Login'
+                  'Sign In'
                 )}
               </button>
             </form>
@@ -332,7 +332,7 @@ export default function Auth() {
           }`}
         >
           <div className="w-full max-w-sm">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Register</h2>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Get Started</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <FloatingInput
                 id="signup-fullName"
@@ -385,7 +385,7 @@ export default function Auth() {
                     Creating account...
                   </>
                 ) : (
-                  'Register'
+                  'Get Started'
                 )}
               </button>
             </form>
