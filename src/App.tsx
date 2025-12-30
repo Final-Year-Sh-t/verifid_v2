@@ -7,6 +7,7 @@ import { AuthProvider } from "@/lib/auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import InstitutionRegister from "./pages/InstitutionRegister";
+import InstitutionOnboarding from "./pages/InstitutionOnboarding";
 import Verify from "./pages/Verify";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/register" element={<InstitutionRegister />} />
+            <Route path="/onboarding" element={<InstitutionOnboarding />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />

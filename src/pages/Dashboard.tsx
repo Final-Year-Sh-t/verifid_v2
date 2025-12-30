@@ -31,7 +31,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { user, institution, isLoading: authLoading } = useAuth();
+  const { user, institution, institutionId, isLoading: authLoading } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -91,6 +91,11 @@ export default function Dashboard() {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect to onboarding if user has no institution
+  if (!institutionId) {
+    return <Navigate to="/onboarding" replace />;
   }
 
   const quickActions = [
