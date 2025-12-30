@@ -11,9 +11,7 @@ import {
   CheckCircle2, 
   XCircle, 
   ArrowRight,
-  TrendingUp,
   Clock,
-  Activity,
   Shield,
   Users,
   Settings,
@@ -155,66 +153,6 @@ export default function Dashboard() {
         </div>
 
         <div className="container px-4 py-6 md:py-8 space-y-6 md:space-y-8">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3 md:gap-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <Card className="relative overflow-hidden">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col">
-                  <Activity className="h-4 w-4 md:h-5 md:w-5 text-primary mb-2" />
-                  <span className="text-xl md:text-3xl font-bold font-display">
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      stats?.totalVerifications || 0
-                    )}
-                  </span>
-                  <span className="text-xs md:text-sm text-muted-foreground mt-1">
-                    Total
-                  </span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-16 w-16 md:h-24 md:w-24 rounded-full bg-primary/5" />
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col">
-                  <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-success mb-2" />
-                  <span className="text-xl md:text-3xl font-bold font-display text-success">
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      stats?.successfulVerifications || 0
-                    )}
-                  </span>
-                  <span className="text-xs md:text-sm text-muted-foreground mt-1">
-                    Verified
-                  </span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-16 w-16 md:h-24 md:w-24 rounded-full bg-success/5" />
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden">
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col">
-                  <XCircle className="h-4 w-4 md:h-5 md:w-5 text-destructive mb-2" />
-                  <span className="text-xl md:text-3xl font-bold font-display text-destructive">
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      stats?.failedVerifications || 0
-                    )}
-                  </span>
-                  <span className="text-xs md:text-sm text-muted-foreground mt-1">
-                    Not Found
-                  </span>
-                </div>
-                <div className="absolute -right-4 -bottom-4 h-16 w-16 md:h-24 md:w-24 rounded-full bg-destructive/5" />
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Quick Actions */}
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <h2 className="font-display text-lg font-semibold mb-4">Quick Actions</h2>
