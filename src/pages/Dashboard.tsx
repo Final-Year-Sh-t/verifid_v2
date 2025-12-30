@@ -5,6 +5,9 @@ import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
   Loader2, 
@@ -15,7 +18,9 @@ import {
   Shield,
   Users,
   Settings,
-  FileText
+  FileText,
+  Building2,
+  Plus
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -30,16 +35,29 @@ interface DashboardStats {
   }>;
 }
 
+type OnboardingStep = 'choice' | 'create' | 'join';
+
 export default function Dashboard() {
   const { user, institution, institutionId, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Onboarding state
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('choice');
+  const [isOnboardingLoading, setIsOnboardingLoading] = useState(false);
+  const [institutionName, setInstitutionName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; name: string; slug: string }>>([]);
+  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && institutionId) {
       fetchDashboardStats();
+    } else {
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, institutionId]);
 
   const fetchDashboardStats = async () => {
     try {
@@ -79,6 +97,146 @@ export default function Dashboard() {
     }
   };
 
+  const handleCreateInstitution = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !institutionName.trim()) return;
+
+    setIsOnboardingLoading(true);
+    try {
+      const slug = institutionName
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+
+      const { data: newInstitution, error: instError } = await supabase
+        .from('institutions')
+        .insert({
+          name: institutionName.trim(),
+          slug: `${slug}-${Date.now().toString(36)}`,
+          welcome_text: `Welcome to ${institutionName.trim()} verification portal`,
+        })
+        .select('id')
+        .single();
+
+      if (instError) throw instError;
+
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .update({ 
+          role: 'admin' as const,
+          institution_id: newInstitution.id 
+        })
+        .eq('user_id', user.id);
+
+      if (roleError) {
+        await supabase
+          .from('user_roles')
+          .insert({
+            user_id: user.id,
+            role: 'admin' as const,
+            institution_id: newInstitution.id,
+          });
+      }
+
+      await supabase
+        .from('profiles')
+        .update({ institution_id: newInstitution.id })
+        .eq('user_id', user.id);
+
+      toast({
+        title: 'Institution created!',
+        description: 'You are now the admin of your institution.',
+      });
+
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Create institution error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create institution.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsOnboardingLoading(false);
+    }
+  };
+
+  const handleSearchInstitutions = async () => {
+    if (!joinCode.trim()) return;
+
+    setIsOnboardingLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('institutions')
+        .select('id, name, slug')
+        .or(`slug.ilike.%${joinCode}%,name.ilike.%${joinCode}%`)
+        .limit(5);
+
+      if (error) throw error;
+
+      setSearchResults(data || []);
+      if (data?.length === 0) {
+        toast({
+          title: 'No institutions found',
+          description: 'Try a different search term.',
+        });
+      }
+    } catch (error: any) {
+      console.error('Search error:', error);
+      toast({
+        title: 'Search failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsOnboardingLoading(false);
+    }
+  };
+
+  const handleJoinInstitution = async () => {
+    if (!user || !selectedInstitution) return;
+
+    setIsOnboardingLoading(true);
+    try {
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .update({ institution_id: selectedInstitution })
+        .eq('user_id', user.id);
+
+      if (roleError) {
+        await supabase
+          .from('user_roles')
+          .insert({
+            user_id: user.id,
+            role: 'user' as const,
+            institution_id: selectedInstitution,
+          });
+      }
+
+      await supabase
+        .from('profiles')
+        .update({ institution_id: selectedInstitution })
+        .eq('user_id', user.id);
+
+      toast({
+        title: 'Joined successfully!',
+        description: 'You have joined the institution.',
+      });
+
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Join error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to join institution.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsOnboardingLoading(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <Layout>
@@ -91,11 +249,6 @@ export default function Dashboard() {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
-  }
-
-  // Redirect to onboarding if user has no institution
-  if (!institutionId) {
-    return <Navigate to="/onboarding" replace />;
   }
 
   const quickActions = [
@@ -135,6 +288,202 @@ export default function Dashboard() {
 
   const firstName = user.user_metadata?.full_name?.split(' ')[0] || 'there';
 
+  // Show onboarding if user has no institution
+  if (!institutionId) {
+    return (
+      <Layout>
+        <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4">
+          <div className="w-full max-w-lg">
+            <div className="text-center mb-8">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl gradient-primary mx-auto mb-4">
+                <Shield className="h-7 w-7 text-primary-foreground" />
+              </div>
+              <h1 className="font-display text-2xl font-bold mb-2">
+                {getGreeting()}, {firstName}!
+              </h1>
+              <p className="text-muted-foreground">
+                {onboardingStep === 'choice' && 'Get started by creating or joining an institution'}
+                {onboardingStep === 'create' && 'Create your new institution'}
+                {onboardingStep === 'join' && 'Find and join an existing institution'}
+              </p>
+            </div>
+
+            {onboardingStep === 'choice' && (
+              <div className="grid gap-4">
+                <Card 
+                  className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50 group"
+                  onClick={() => setOnboardingStep('create')}
+                >
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <Plus className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">Create Institution</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Start fresh and set up your own verification portal
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </CardContent>
+                </Card>
+
+                <Card 
+                  className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50 group"
+                  onClick={() => setOnboardingStep('join')}
+                >
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-foreground shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">Join Institution</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Connect with an existing institution
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {onboardingStep === 'create' && (
+              <Card>
+                <CardContent className="p-6">
+                  <form onSubmit={handleCreateInstitution} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="institutionName" className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        Institution Name
+                      </Label>
+                      <Input
+                        id="institutionName"
+                        placeholder="Acme University"
+                        value={institutionName}
+                        onChange={(e) => setInstitutionName(e.target.value)}
+                        disabled={isOnboardingLoading}
+                        required
+                      />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setOnboardingStep('choice')}
+                        disabled={isOnboardingLoading}
+                        className="flex-1"
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 gradient-primary border-0"
+                        disabled={isOnboardingLoading || !institutionName.trim()}
+                      >
+                        {isOnboardingLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Creating...
+                          </>
+                        ) : (
+                          'Create Institution'
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            {onboardingStep === 'join' && (
+              <Card>
+                <CardContent className="p-6 space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="joinCode" className="flex items-center gap-2">
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                      Search by Name or Code
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="joinCode"
+                        placeholder="Institution name or code..."
+                        value={joinCode}
+                        onChange={(e) => setJoinCode(e.target.value)}
+                        disabled={isOnboardingLoading}
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleSearchInstitutions}
+                        disabled={isOnboardingLoading || !joinCode.trim()}
+                        variant="secondary"
+                      >
+                        {isOnboardingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {searchResults.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Select Institution</Label>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {searchResults.map((inst) => (
+                          <div
+                            key={inst.id}
+                            onClick={() => setSelectedInstitution(inst.id)}
+                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                              selectedInstitution === inst.id
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="font-medium">{inst.name}</div>
+                            <div className="text-xs text-muted-foreground font-mono">{inst.slug}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setOnboardingStep('choice');
+                        setSearchResults([]);
+                        setSelectedInstitution(null);
+                      }}
+                      disabled={isOnboardingLoading}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handleJoinInstitution}
+                      className="flex-1 gradient-primary border-0"
+                      disabled={isOnboardingLoading || !selectedInstitution}
+                    >
+                      {isOnboardingLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Joining...
+                        </>
+                      ) : (
+                        'Join Institution'
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-[calc(100vh-8rem)]">
@@ -144,7 +493,7 @@ export default function Dashboard() {
             <div className="animate-fade-in">
               <div className="flex items-center gap-2 text-primary mb-2">
                 <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">VerifyID Dashboard</span>
+                <span className="text-sm font-medium">VerifyID Home</span>
               </div>
               <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2">
                 {getGreeting()}, {firstName}!
@@ -162,7 +511,7 @@ export default function Dashboard() {
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <h2 className="font-display text-lg font-semibold mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {quickActions.map((action, index) => (
+              {quickActions.map((action) => (
                 <Link key={action.title} to={action.href}>
                   <Card 
                     className={`h-full transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-pointer group ${
