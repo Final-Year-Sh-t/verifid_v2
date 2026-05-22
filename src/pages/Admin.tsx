@@ -200,29 +200,38 @@ export default function Admin() {
       if (institutionId) {
         const { data: membersData, error: membersError } = await supabase
           .from('user_roles')
-          .select(`
-            id,
-            user_id,
-            role,
-            staff_type,
-            profiles!user_roles_user_id_fkey (full_name, avatar_url)
-          `)
+          .select('id, user_id, role, staff_type')
           .eq('institution_id', institutionId);
 
         if (membersError) {
           console.error('Error fetching members:', membersError);
         } else {
-          // Transform the data to match our interface
+          const userIds = (membersData || []).map((m) => m.user_id);
+          let profilesById: Record<string, { full_name: string | null; avatar_url: string | null }> = {};
+          if (userIds.length > 0) {
+            const { data: profilesData, error: profilesError } = await supabase
+              .from('profiles')
+              .select('user_id, full_name, avatar_url')
+              .in('user_id', userIds);
+            if (profilesError) {
+              console.error('Error fetching member profiles:', profilesError);
+            } else {
+              profilesById = Object.fromEntries(
+                (profilesData || []).map((p) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
+              );
+            }
+          }
           const transformedMembers: Member[] = (membersData || []).map((m: any) => ({
             id: m.id,
             user_id: m.user_id,
             role: m.role,
             staff_type: m.staff_type,
-            profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles,
+            profiles: profilesById[m.user_id] ?? null,
           }));
           setMembers(transformedMembers);
         }
       }
+
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
