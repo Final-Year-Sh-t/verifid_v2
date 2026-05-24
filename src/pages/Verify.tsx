@@ -65,7 +65,7 @@ export default function Verify() {
         .from('index_records')
         .select('index_number, full_name, photo_url, organization, issued_at, expires_at, status')
         .eq('index_number', indexNumber.trim().toUpperCase())
-        .eq('status', 'verified')
+        .eq('status', 'active')
         .maybeSingle();
 
       if (error) {

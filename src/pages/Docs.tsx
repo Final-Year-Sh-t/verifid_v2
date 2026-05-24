@@ -110,11 +110,11 @@ Contact your system administrator if you need admin access.`
    - Organization
    - Issue Date
    - Expiry Date
-   - Status (Pending, Verified, Rejected, Expired)
+   - Status (Active, Inactive, Expired)
 3. Optionally add a photo URL
 4. Click "Create" to save
 
-Records must be set to "Verified" status to appear in search results.`
+Records must be set to "Active" status to appear in search results.`
       },
       {
         title: 'Verification Logs',
@@ -169,7 +169,7 @@ const faqs = [
   },
   {
     question: 'What if I can\'t find a record?',
-    answer: 'If a record isn\'t found, it could mean: the identification number is incorrect, the record doesn\'t exist in the system, or the record status is not "verified". Double-check the identification number and try again.',
+    answer: 'If a record isn\'t found, it could mean: the identification number is incorrect, the record doesn\'t exist in the system, or the record status is not "active". Double-check the identification number and try again.',
   },
   {
     question: 'How long are records valid?',

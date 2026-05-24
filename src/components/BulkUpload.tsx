@@ -182,7 +182,7 @@ export function BulkUpload({ institutionId, userId, onComplete }: BulkUploadProp
         issued_at: formatDate(normalizedRow.issued_at),
         expires_at: formatDate(normalizedRow.expires_at),
         photo_url: normalizedRow.photo_url || undefined,
-        status: normalizedRow.status || 'verified',
+        status: normalizedRow.status || 'active',
       };
     });
   };
@@ -268,9 +268,9 @@ export function BulkUpload({ institutionId, userId, onComplete }: BulkUploadProp
           issued_at: record.issued_at,
           expires_at: record.expires_at,
           photo_url: record.photo_url || null,
-          status: (['pending', 'verified', 'rejected', 'expired'].includes(record.status || '') 
+          status: (['active', 'inactive', 'expired'].includes(record.status || '') 
             ? record.status 
-            : 'verified') as 'pending' | 'verified' | 'rejected' | 'expired',
+            : 'active') as 'active' | 'inactive' | 'expired',
           created_by: userId,
           institution_id: institutionId,
         };
@@ -311,8 +311,8 @@ export function BulkUpload({ institutionId, userId, onComplete }: BulkUploadProp
     const headers = [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS];
     const sampleData = [
       headers.join(','),
-      'ID-2024-001,John Doe,Engineering Department,2024-01-01,2025-12-31,,verified',
-      'ID-2024-002,Jane Smith,Science Department,2024-01-01,2025-12-31,,pending',
+      'ID-2024-001,John Doe,Engineering Department,2024-01-01,2025-12-31,,active',
+      'ID-2024-002,Jane Smith,Science Department,2024-01-01,2025-12-31,,inactive',
     ].join('\n');
 
     const blob = new Blob([sampleData], { type: 'text/csv' });
