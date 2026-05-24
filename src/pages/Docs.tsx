@@ -110,11 +110,11 @@ Contact your system administrator if you need admin access.`
    - Organization
    - Issue Date
    - Expiry Date
-   - Status (Pending, Verified, Rejected, Expired)
+   - Status (Active, Inactive, Expired)
 3. Optionally add a photo URL
 4. Click "Create" to save
 
-Records must be set to "Verified" status to appear in search results.`
+Records must be set to "Active" status to appear in search results.`
       },
       {
         title: 'Verification Logs',

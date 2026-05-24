@@ -13,7 +13,7 @@ interface StudentRecord {
   issued_at: string;
   expires_at: string;
   photo_url?: string;
-  status?: "pending" | "verified" | "rejected" | "expired";
+  status?: "active" | "inactive" | "expired";
 }
 
 interface UploadRequest {
@@ -114,10 +114,10 @@ serve(async (req: Request): Promise<Response> => {
       }
 
       // Validate status
-      const validStatuses = ["pending", "verified", "rejected", "expired"];
+      const validStatuses = ["active", "inactive", "expired"];
       const status = record.status && validStatuses.includes(record.status) 
         ? record.status 
-        : "verified";
+        : "active";
 
       validRecords.push({
         index_number: record.index_number.trim().toUpperCase(),
