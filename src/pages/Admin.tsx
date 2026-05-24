@@ -48,7 +48,7 @@ interface IndexRecord {
   organization: string;
   issued_at: string;
   expires_at: string;
-  status: 'pending' | 'verified' | 'rejected' | 'expired';
+  status: 'active' | 'inactive' | 'expired';
   created_at: string;
 }
 
@@ -68,7 +68,7 @@ interface Member {
   profiles: { full_name: string | null; avatar_url: string | null } | null;
 }
 
-type RecordStatus = 'pending' | 'verified' | 'rejected' | 'expired';
+type RecordStatus = 'active' | 'inactive' | 'expired';
 
 interface UserInstitution {
   institution_id: string;
@@ -107,7 +107,7 @@ export default function Admin() {
     organization: '',
     issued_at: '',
     expires_at: '',
-    status: 'pending',
+    status: 'active',
   });
 
   useEffect(() => {
@@ -374,7 +374,7 @@ export default function Admin() {
       organization: '',
       issued_at: '',
       expires_at: '',
-      status: 'pending',
+      status: 'active',
     });
   };
 
@@ -418,21 +418,19 @@ export default function Admin() {
 
   const stats = {
     total: records.length,
-    verified: records.filter((r) => r.status === 'verified').length,
-    pending: records.filter((r) => r.status === 'pending').length,
+    active: records.filter((r) => r.status === 'active').length,
+    inactive: records.filter((r) => r.status === 'inactive').length,
     verifications: logs.length,
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'verified':
-        return <Badge className="bg-success">Verified</Badge>;
-      case 'pending':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-      case 'rejected':
-        return <Badge variant="destructive">Rejected</Badge>;
+      case 'active':
+        return <Badge className="bg-success">Active</Badge>;
+      case 'inactive':
+        return <Badge variant="secondary">Inactive</Badge>;
       case 'expired':
-        return <Badge variant="outline">Expired</Badge>;
+        return <Badge variant="destructive">Expired</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -535,9 +533,8 @@ export default function Admin() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="verified">Verified</SelectItem>
-                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
                         <SelectItem value="expired">Expired</SelectItem>
                       </SelectContent>
                     </Select>
@@ -622,20 +619,20 @@ export default function Admin() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Verified</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Active</CardTitle>
               <CheckCircle2 className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-display">{stats.verified}</div>
+              <div className="text-2xl font-bold font-display">{stats.active}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-warning" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Inactive</CardTitle>
+              <XCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-display">{stats.pending}</div>
+              <div className="text-2xl font-bold font-display">{stats.inactive}</div>
             </CardContent>
           </Card>
           <Card>
