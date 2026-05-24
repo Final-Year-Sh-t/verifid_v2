@@ -182,7 +182,7 @@ export function BulkUpload({ institutionId, userId, onComplete }: BulkUploadProp
         issued_at: formatDate(normalizedRow.issued_at),
         expires_at: formatDate(normalizedRow.expires_at),
         photo_url: normalizedRow.photo_url || undefined,
-        status: normalizedRow.status || 'pending',
+        status: normalizedRow.status || 'verified',
       };
     });
   };
