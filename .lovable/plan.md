@@ -1,44 +1,60 @@
-# System Architecture Diagram for VerifyID
+# Sequence Diagram for VerifyID
 
-Create a Mermaid architecture diagram saved to `/mnt/documents/VerifyID_Architecture.mmd` and emit as a downloadable artifact.
+Create a Mermaid sequence diagram saved to `/mnt/documents/VerifyID_Sequence.mmd` and emit it as a downloadable artifact.
 
-## Layers
+## Note on stack
 
-**Client (Browser)**
-- React 18 + Vite + TypeScript SPA
-- Tailwind + shadcn/ui
-- React Router, TanStack Query, React Hook Form + Zod
-- Auth Context (`src/lib/auth.tsx`)
-- Pages: Index, Auth, Dashboard, Verify, Admin, SuperAdmin, InstitutionRegister, InstitutionSettings, Docs
+Your description mentions Firebase + Gemini API, but this project actually uses **Lovable Cloud (Supabase)** for auth/database/storage/edge functions, and **Lovable AI Gateway** (which serves Google Gemini and OpenAI models) for AI. I'll label the lifelines accordingly so the diagram matches the real system. If you'd prefer the labels to literally say "Firebase" and "Gemini API" for an assignment, tell me and I'll relabel.
 
-**Lovable Cloud (Backend — powered by Supabase)**
-- **Auth**: email/password + Google OAuth
-- **PostgreSQL Database** with RLS
-  - Tables: institutions, profiles, user_roles, index_records, verification_logs
-  - Functions: has_role, is_super_admin, get_user_institution, switch_active_institution
-- **Edge Functions (Deno)**: `upload-students`
-- **File Storage**: `institution-logos` bucket
-- **AI Gateway** (Lovable AI, via LOVABLE_API_KEY)
+## Participants (lifelines)
 
-**External**
-- Google OAuth provider
-- End user's browser
+- `User` (End user / verifier)
+- `SPA` (React Frontend — Vite + Auth Context)
+- `Auth` (Lovable Cloud Auth)
+- `DB` (PostgreSQL via PostgREST + RLS)
+- `EdgeFn` (Edge Function: `upload-students`)
+- `Storage` (institution-logos bucket)
+- `AI` (Lovable AI Gateway — Gemini / GPT)
 
-## Flow Arrows
+## Journey covered (chronological)
 
-- Browser ⇄ React SPA
-- SPA → Supabase Auth (sign in/up, Google OAuth)
-- SPA → PostgREST (CRUD on tables, gated by RLS)
-- SPA → Edge Function `upload-students` (bulk CSV/Excel)
-- Edge Function → PostgreSQL (service role inserts)
-- SPA → Storage (logo upload/fetch)
-- Auth → user_roles / profiles (trigger creates profile on signup)
-- PostgreSQL RLS → calls `has_role` / `get_user_institution`
+1. **Sign in**
+   - User submits credentials → SPA → Auth → returns session/JWT
+   - SPA → DB: fetch `user_roles` + active institution
+   - SPA → DB: fetch `institutions` row for branding
+   - SPA renders themed dashboard
+
+2. **Verify an identity** (core flow)
+   - User enters identification number on `/verify`
+   - SPA → DB: `select from index_records where index_number = ? and status='active'` (RLS calls `has_role` / `get_user_institution`)
+   - DB → SPA: record or null
+   - SPA → DB: `insert into verification_logs` (institution_id, verified_by, result)
+   - SPA renders result card (found / not found / expired)
+
+3. **Admin bulk upload** (optional branch)
+   - Admin selects CSV/Excel → SPA → EdgeFn `upload-students` (with JWT)
+   - EdgeFn validates rows → EdgeFn → DB (service role insert into `index_records`)
+   - EdgeFn → SPA: summary (inserted / skipped / errors)
+
+4. **AI assist** (optional branch, e.g. doc Q&A or summary)
+   - SPA → EdgeFn `chat` → AI Gateway (`google/gemini-3-flash-preview`, stream)
+   - AI → EdgeFn → SPA (SSE token stream)
+
+5. **Sign out**
+   - User → SPA → Auth: signOut → session cleared
+
+## Technical details
+
+- Mermaid `sequenceDiagram` syntax with `autonumber`.
+- Use `Note over` blocks to call out RLS enforcement on `index_records` and `verification_logs`.
+- Use `alt` / `opt` blocks for: found vs not found, bulk upload branch, AI branch.
+- Keep arrows: `->>` for sync calls, `-->>` for responses, `--)` for async/stream.
+- No emojis (Mermaid lexer).
 
 ## Deliverable
 
-Single Mermaid `flowchart TB` with grouped subgraphs (Client, Lovable Cloud, External) and styled nodes. Output:
+Single `.mmd` file plus artifact tag:
 
 ```
-<presentation-artifact path="VerifyID_Architecture.mmd" mime_type="text/vnd.mermaid"></presentation-artifact>
+<presentation-artifact path="VerifyID_Sequence.mmd" mime_type="text/vnd.mermaid"></presentation-artifact>
 ```
