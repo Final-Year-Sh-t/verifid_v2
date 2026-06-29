@@ -5,7 +5,7 @@ import { Shield, FileText, Search, Settings, LogOut, Menu, X, Building2, Cog, La
 import { useState } from 'react';
 
 export function Navbar() {
-  const { user, isAdmin, isSuperAdmin, institution, signOut } = useAuth();
+  const { user, isAdmin, isSuperAdmin, institution, institutionId, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
