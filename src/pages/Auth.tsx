@@ -215,6 +215,7 @@ export default function Auth() {
                 value={formData.password}
                 onChange={handleInputChange}
                 error={errors.password}
+                showToggle
               />
               {isSignUp && (
                 <FloatingInput
@@ -225,7 +226,8 @@ export default function Auth() {
                   icon={<Lock className="h-5 w-5" />}
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  error={errors.confirmPassword}
+                error={errors.confirmPassword}
+                showToggle
                 />
               )}
               <button
@@ -306,6 +308,7 @@ export default function Auth() {
                 value={formData.password}
                 onChange={handleInputChange}
                 error={errors.password}
+                showToggle
               />
               <button
                 type="submit"
@@ -363,6 +366,7 @@ export default function Auth() {
                 value={formData.password}
                 onChange={handleInputChange}
                 error={errors.password}
+                showToggle
               />
               <FloatingInput
                 id="signup-confirmPassword"
@@ -373,6 +377,7 @@ export default function Auth() {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 error={errors.confirmPassword}
+                showToggle
               />
               <button
                 type="submit"
