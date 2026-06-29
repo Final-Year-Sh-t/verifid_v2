@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
-import { Shield, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
+import { Shield, Mail, Lock, User, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
