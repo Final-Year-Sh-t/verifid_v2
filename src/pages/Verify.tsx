@@ -44,6 +44,35 @@ export default function Verify() {
     return <Navigate to="/auth" replace />;
   }
 
+  if (!institutionId) {
+    return (
+      <Layout>
+        <div className="container py-12">
+          <Card className="mx-auto max-w-xl border-destructive/50">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/20">
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                </div>
+                <div>
+                  <CardTitle className="font-display text-lg">Access Restricted</CardTitle>
+                  <CardDescription>
+                    You must be a member of an institution to verify identities.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Join or register an institution from your dashboard to gain access to verification.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     
