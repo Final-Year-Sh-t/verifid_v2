@@ -406,11 +406,14 @@ interface FloatingInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  showToggle?: boolean;
 }
 
-function FloatingInput({ id, name, type, label, icon, value, onChange, error }: FloatingInputProps) {
+function FloatingInput({ id, name, type, label, icon, value, onChange, error, showToggle }: FloatingInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const isActive = isFocused || value.length > 0;
+  const inputType = showToggle && showPassword ? 'text' : type;
 
   return (
     <div className="relative">
@@ -418,12 +421,14 @@ function FloatingInput({ id, name, type, label, icon, value, onChange, error }: 
         <input
           id={id}
           name={name}
-          type={type}
+          type={inputType}
           value={value}
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={`w-full px-4 py-3 pl-12 bg-muted/50 border rounded-lg outline-none transition-all duration-300 text-foreground ${
+            showToggle ? 'pr-12' : 'pr-4'
+          } ${
             error 
               ? 'border-destructive focus:border-destructive' 
               : 'border-border focus:border-primary'
@@ -444,6 +449,16 @@ function FloatingInput({ id, name, type, label, icon, value, onChange, error }: 
         }`}>
           {icon}
         </span>
+        {showToggle && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        )}
       </div>
       {error && (
         <p className="mt-1 text-sm text-destructive">{error}</p>
