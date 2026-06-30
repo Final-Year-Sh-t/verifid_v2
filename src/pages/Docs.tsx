@@ -197,7 +197,7 @@ export default function Docs() {
               <span>Documentation</span>
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight mb-4">
-              VerifyID Documentation
+              VerifyID Help
             </h1>
             <p className="text-lg text-muted-foreground">
               Everything you need to know about using the identity verification system.
