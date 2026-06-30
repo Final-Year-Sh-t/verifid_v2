@@ -22,11 +22,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: '99.9%', label: 'Uptime' },
-  { value: '<1s', label: 'Verification Time' },
-  { value: '256-bit', label: 'Encryption' },
-];
 
 export default function Index() {
   const { user } = useAuth();
