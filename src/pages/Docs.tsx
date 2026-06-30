@@ -194,10 +194,10 @@ export default function Docs() {
           <div className="mx-auto max-w-2xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm mb-6">
               <BookOpen className="h-4 w-4 text-primary" />
-              <span>Documentation</span>
+              <span>Help</span>
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight mb-4">
-              VerifyID Documentation
+              VerifyID Help
             </h1>
             <p className="text-lg text-muted-foreground">
               Everything you need to know about using the identity verification system.

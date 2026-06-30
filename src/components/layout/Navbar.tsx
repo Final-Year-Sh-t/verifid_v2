@@ -18,7 +18,7 @@ export function Navbar() {
   const navLinks = [
     { to: '/dashboard', label: 'Home', icon: LayoutDashboard, requiresAuth: true },
     ...(institutionId || isSuperAdmin ? [{ to: '/verify', label: 'Verify', icon: Search, requiresAuth: true }] : []),
-    { to: '/docs', label: 'Documentation', icon: FileText, requiresAuth: false },
+    { to: '/docs', label: 'Help', icon: FileText, requiresAuth: false },
     ...(isAdmin ? [
       { to: '/admin', label: 'Admin', icon: Settings, requiresAuth: true },
       { to: '/settings', label: 'Settings', icon: Cog, requiresAuth: true },
