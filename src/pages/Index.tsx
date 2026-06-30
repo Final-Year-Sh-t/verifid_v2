@@ -71,15 +71,6 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="mx-auto mt-16 grid max-w-2xl grid-cols-3 gap-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="font-display text-3xl font-bold text-primary-foreground">{stat.value}</div>
-                <div className="text-sm text-primary-foreground/60">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
