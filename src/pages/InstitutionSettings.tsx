@@ -206,6 +206,7 @@ export default function InstitutionSettings() {
 
       if (error) throw error;
 
+      await refreshAuth();
       toast({ title: 'Settings saved successfully' });
     } catch (error: any) {
       toast({
