@@ -17,6 +17,7 @@ interface VerificationResult {
     full_name: string;
     photo_url: string | null;
     organization: string;
+    institutions: { name: string } | null;
     issued_at: string;
     expires_at: string;
     status: string;
@@ -92,7 +93,7 @@ export default function Verify() {
       // Search for the index number
       const { data, error } = await supabase
         .from('index_records')
-        .select('index_number, full_name, photo_url, organization, issued_at, expires_at, status')
+        .select('index_number, full_name, photo_url, organization, issued_at, expires_at, status, institutions(name)')
         .eq('index_number', indexNumber.trim().toUpperCase())
         .eq('status', 'active')
         .maybeSingle();
@@ -235,7 +236,9 @@ export default function Verify() {
                             <Building2 className="h-3 w-3" />
                             Organization
                           </div>
-                          <div className="font-medium">{result.data.organization}</div>
+                          <div className="font-medium">
+                            {result.data.institutions?.name ?? result.data.organization}
+                          </div>
                         </div>
 
                         <div>
