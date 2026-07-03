@@ -206,6 +206,13 @@ export default function InstitutionSettings() {
 
       if (error) throw error;
 
+      const { error: recordsError } = await supabase
+        .from('index_records')
+        .update({ organization: settings.name })
+        .eq('institution_id', institutionId);
+
+      if (recordsError) throw recordsError;
+
       await refreshAuth();
       toast({ title: 'Settings saved successfully' });
     } catch (error: any) {

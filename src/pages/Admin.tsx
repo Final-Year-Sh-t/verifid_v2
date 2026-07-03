@@ -255,7 +255,7 @@ export default function Admin() {
             index_number: formData.index_number.toUpperCase(),
             full_name: formData.full_name,
             photo_url: formData.photo_url || null,
-            organization: formData.organization,
+            organization: institution?.name || formData.organization,
             issued_at: formData.issued_at,
             expires_at: formData.expires_at,
             status: formData.status,
@@ -271,7 +271,7 @@ export default function Admin() {
             index_number: formData.index_number.toUpperCase(),
             full_name: formData.full_name,
             photo_url: formData.photo_url || null,
-            organization: formData.organization,
+            organization: institution?.name || formData.organization,
             issued_at: formData.issued_at,
             expires_at: formData.expires_at,
             status: formData.status,
@@ -410,11 +410,16 @@ export default function Admin() {
     );
   }
 
-  const filteredRecords = records.filter((record) =>
-    record.index_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.organization.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getRecordOrganization = (record: IndexRecord) => institution?.name || record.organization;
+
+  const filteredRecords = records.filter((record) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      record.index_number.toLowerCase().includes(search) ||
+      record.full_name.toLowerCase().includes(search) ||
+      getRecordOrganization(record).toLowerCase().includes(search)
+    );
+  });
 
   const stats = {
     total: records.length,
@@ -709,7 +714,7 @@ export default function Admin() {
                           <TableRow key={record.id}>
                             <TableCell className="font-mono">{record.index_number}</TableCell>
                             <TableCell>{record.full_name}</TableCell>
-                            <TableCell>{record.organization}</TableCell>
+                            <TableCell>{getRecordOrganization(record)}</TableCell>
                             <TableCell>{getStatusBadge(record.status)}</TableCell>
                             <TableCell>{new Date(record.expires_at).toLocaleDateString()}</TableCell>
                             <TableCell className="text-right">
