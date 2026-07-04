@@ -73,7 +73,7 @@ interface UserInstitution {
 type OnboardingStep = 'choice' | 'create' | 'join';
 
 export default function Dashboard() {
-  const { user, institution, institutionId, isLoading: authLoading, refreshAuth } = useAuth();
+  const { user, isAdmin, institution, institutionId, isLoading: authLoading, refreshAuth } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
