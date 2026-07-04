@@ -807,7 +807,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-lg font-semibold">Recent Activity</h2>
               {stats?.recentVerifications && stats.recentVerifications.length > 0 && (
-                <Link to="/verify" className="text-sm text-primary hover:underline flex items-center gap-1">
+                <Link to="/activity" className="text-sm text-primary hover:underline flex items-center gap-1">
                   View all <ArrowRight className="h-3 w-3" />
                 </Link>
               )}
