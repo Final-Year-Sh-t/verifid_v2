@@ -309,33 +309,49 @@ export default function Dashboard() {
     return <Navigate to="/auth" replace />;
   }
 
-  const quickActions = [
-    {
-      icon: Search,
-      title: 'Verify Identity',
-      description: 'Search and verify records',
-      href: '/verify',
-      primary: true,
-    },
-    {
-      icon: Users,
-      title: 'Manage Records',
-      description: 'View all records',
-      href: '/admin',
-    },
-    {
-      icon: Settings,
-      title: 'Settings',
-      description: 'Configure your account',
-      href: '/settings',
-    },
-    {
-      icon: FileText,
-      title: 'Documentation',
-      description: 'API & guides',
-      href: '/docs',
-    },
-  ];
+  const quickActions = isAdmin
+    ? [
+        {
+          icon: Search,
+          title: 'Verify Identity',
+          description: 'Search and verify records',
+          href: '/verify',
+          primary: true,
+        },
+        {
+          icon: Users,
+          title: 'Manage Records',
+          description: 'View all records',
+          href: '/admin',
+        },
+        {
+          icon: Settings,
+          title: 'Settings',
+          description: 'Configure your account',
+          href: '/settings',
+        },
+        {
+          icon: FileText,
+          title: 'Help',
+          description: 'API & guides',
+          href: '/docs',
+        },
+      ]
+    : [
+        {
+          icon: Search,
+          title: 'Verify Identity',
+          description: 'Search and verify records',
+          href: '/verify',
+          primary: true,
+        },
+        {
+          icon: FileText,
+          title: 'Help',
+          description: 'API & guides',
+          href: '/docs',
+        },
+      ];
 
   const getGreeting = () => {
     const hour = new Date().getHours();
