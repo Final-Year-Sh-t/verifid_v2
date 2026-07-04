@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import SuperAdmin from "./pages/SuperAdmin";
 import InstitutionSettings from "./pages/InstitutionSettings";
 import Docs from "./pages/Docs";
+import Activity from "./pages/Activity";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
