@@ -73,7 +73,7 @@ interface UserInstitution {
 type OnboardingStep = 'choice' | 'create' | 'join';
 
 export default function Dashboard() {
-  const { user, institution, institutionId, isLoading: authLoading, refreshAuth } = useAuth();
+  const { user, isAdmin, institution, institutionId, isLoading: authLoading, refreshAuth } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -309,33 +309,49 @@ export default function Dashboard() {
     return <Navigate to="/auth" replace />;
   }
 
-  const quickActions = [
-    {
-      icon: Search,
-      title: 'Verify Identity',
-      description: 'Search and verify records',
-      href: '/verify',
-      primary: true,
-    },
-    {
-      icon: Users,
-      title: 'Manage Records',
-      description: 'View all records',
-      href: '/admin',
-    },
-    {
-      icon: Settings,
-      title: 'Settings',
-      description: 'Configure your account',
-      href: '/settings',
-    },
-    {
-      icon: FileText,
-      title: 'Documentation',
-      description: 'API & guides',
-      href: '/docs',
-    },
-  ];
+  const quickActions = isAdmin
+    ? [
+        {
+          icon: Search,
+          title: 'Verify Identity',
+          description: 'Search and verify records',
+          href: '/verify',
+          primary: true,
+        },
+        {
+          icon: Users,
+          title: 'Manage Records',
+          description: 'View all records',
+          href: '/admin',
+        },
+        {
+          icon: Settings,
+          title: 'Settings',
+          description: 'Configure your account',
+          href: '/settings',
+        },
+        {
+          icon: FileText,
+          title: 'Help',
+          description: 'API & guides',
+          href: '/docs',
+        },
+      ]
+    : [
+        {
+          icon: Search,
+          title: 'Verify Identity',
+          description: 'Search and verify records',
+          href: '/verify',
+          primary: true,
+        },
+        {
+          icon: FileText,
+          title: 'Help',
+          description: 'API & guides',
+          href: '/docs',
+        },
+      ];
 
   const getGreeting = () => {
     const hour = new Date().getHours();
